@@ -373,7 +373,13 @@ SQL;
 
 	/** @return array<int,FreshRSS_Feed> where the key is the feed ID */
 	public function listFeeds(): array {
-		$sql = 'SELECT * FROM `_feed` ORDER BY name';
+		/* $sql = 'SELECT * FROM `_feed` ORDER BY name'; */
+        $sql = 'SELECT f.*, MAX(e.date) as last_update ' .
+            'FROM `_feed` f ' .
+            'LEFT JOIN `_entry` e ON f.id = e.id_feed ' .
+            'GROUP BY f.id ' .
+            'ORDER BY last_update DESC';
+
 		$res = $this->fetchAssoc($sql);
 		if (!is_array($res)) {
 			return [];
