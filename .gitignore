@@ -27,3 +27,4 @@
 *.save
 *.autosav
 *.autosave
+tmp/
