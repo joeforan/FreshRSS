@@ -222,7 +222,7 @@ class FreshRSS_CategoryDAO extends Minz_ModelPdo
 		}
 	}
 
-	public function updateLastUpdate(int $id, bool $inError = false, int $mtime = 0): int|false
+	public function updateLastUpdate(int $id, bool $inError = false, int $mtime = 0): int|false {
 		$sql = <<<'SQL'
 			UPDATE `_category` SET `lastUpdate`=:last_update, error=0 WHERE id=:id
 			SQL;
@@ -261,16 +261,10 @@ class FreshRSS_CategoryDAO extends Minz_ModelPdo
 		}
 	}
 
-<<<<<<< variant A
 	public function deleteCategory(int $id): int|false {
 		$sql = <<<'SQL'
 			DELETE FROM `_category` WHERE id=:id
 			SQL;
->>>>>>> variant B
-	public function deleteCategory(int $id): int|false
-	{
-		$sql = 'DELETE FROM `_category` WHERE id=:id';
-======= end
 		$stm = $this->pdo->prepare($sql);
 		if ($stm !== false && $stm->bindValue(':id', $id, PDO::PARAM_INT) && $stm->execute()) {
 			return $stm->rowCount();
@@ -282,16 +276,10 @@ class FreshRSS_CategoryDAO extends Minz_ModelPdo
 	}
 
 	/** @return Traversable<array{id:int,name:string,kind:int,lastUpdate:int,error:int,attributes?:array<string,mixed>}> */
-<<<<<<< variant A
 	public function selectAll(): Traversable {
 		$sql = <<<'SQL'
 			SELECT id, name, kind, `lastUpdate`, error, attributes FROM `_category`
 			SQL;
->>>>>>> variant B
-	public function selectAll(): Traversable
-	{
-		$sql = 'SELECT id, name, kind, `lastUpdate`, error, attributes FROM `_category`';
-======= end
 		$stm = $this->pdo->query($sql);
 		if ($stm !== false) {
 			while (is_array($row = $stm->fetch(PDO::FETCH_ASSOC))) {
@@ -309,32 +297,20 @@ class FreshRSS_CategoryDAO extends Minz_ModelPdo
 		}
 	}
 
-<<<<<<< variant A
 	public function searchById(int $id): ?FreshRSS_Category {
 		$sql = <<<'SQL'
 			SELECT * FROM `_category` WHERE id=:id
 			SQL;
->>>>>>> variant B
-	public function searchById(int $id): ?FreshRSS_Category
-	{
-		$sql = 'SELECT * FROM `_category` WHERE id=:id';
-======= end
 		$res = $this->fetchAssoc($sql, ['id' => $id]) ?? [];
 		/** @var list<array{name:string,id:int,kind:int,lastUpdate?:int,error:int,attributes?:string}> $res */
 		$categories = self::daoToCategories($res);
 		return reset($categories) ?: null;
 	}
 
-<<<<<<< variant A
 	public function searchByName(string $name): ?FreshRSS_Category {
 		$sql = <<<'SQL'
 			SELECT * FROM `_category` WHERE name=:name
 			SQL;
->>>>>>> variant B
-	public function searchByName(string $name): ?FreshRSS_Category
-	{
-		$sql = 'SELECT * FROM `_category` WHERE name=:name';
-======= end
 		$res = $this->fetchAssoc($sql, ['name' => $name]) ?? [];
 		/** @var list<array{name:string,id:int,kind:int,lastUpdate:int,error:int,attributes:string}> $res */
 		$categories = self::daoToCategories($res);
@@ -366,7 +342,6 @@ class FreshRSS_CategoryDAO extends Minz_ModelPdo
 	public function listCategories(bool $prePopulateFeeds = true, bool $details = false): array
 	{
 		if ($prePopulateFeeds) {
-<<<<<<< variant A
 			$feedFields = $details ?
 				'f.*' :
 				'f.id, f.name, f.url, f.kind, f.website, f.priority, f.error, f.attributes, f.`cache_nbEntries`, f.`cache_nbUnreads`, f.ttl';
@@ -375,18 +350,12 @@ class FreshRSS_CategoryDAO extends Minz_ModelPdo
 					{$feedFields}
 				FROM `_category` c
 				LEFT OUTER JOIN `_feed` f ON f.category=c.id
+				LEFT JOIN `_entry` e ON f.id=e.id_feed 
 				GROUP BY f.id, c_id
 				ORDER BY c.name, f.name
 				SQL;
->>>>>>> variant B
-			$sql = 'SELECT c.id AS c_id, c.name AS c_name, c.kind AS c_kind, c.`lastUpdate` AS c_last_update, c.error AS c_error, c.attributes AS c_attributes, '
-				. ($details ? 'f.* ' : 'f.id, f.name, f.url, f.kind, f.website, f.priority, f.error, f.attributes, f.`cache_nbEntries`, f.`cache_nbUnreads`, f.ttl ')
-				. 'FROM `_category` c '
-				. 'LEFT OUTER JOIN `_feed` f ON f.category=c.id '
-				. 'LEFT JOIN `_entry` e ON f.id=e.id_feed '
 				. 'GROUP BY f.id, c_id '
 				. 'ORDER BY c.name, MAX(e.date) DESC';
-======= end
 			$stm = $this->pdo->prepare($sql);
 			if ($stm !== false && $stm->execute() && ($res = $stm->fetchAll(PDO::FETCH_ASSOC)) !== false) {
 				/** @var list<array{c_name:string,c_id:int,c_kind:int,c_last_update:int,c_error:int,c_attributes?:string,
@@ -409,18 +378,11 @@ class FreshRSS_CategoryDAO extends Minz_ModelPdo
 	}
 
 	/** @return array<int,FreshRSS_Category> where the key is the category ID */
-<<<<<<< variant A
 	public function listCategoriesOrderUpdate(int $defaultCacheDuration = 86400, int $limit = 0): array {
 		$limitSql = $limit < 1 ? '' : 'LIMIT ' . $limit;
 		$sql = <<<SQL
 			SELECT * FROM `_category` WHERE kind = :kind AND `lastUpdate` < :lu ORDER BY `lastUpdate` {$limitSql}
 			SQL;
->>>>>>> variant B
-	public function listCategoriesOrderUpdate(int $defaultCacheDuration = 86400, int $limit = 0): array
-	{
-		$sql = 'SELECT * FROM `_category` WHERE kind = :kind AND `lastUpdate` < :lu ORDER BY `lastUpdate`'
-			. ($limit < 1 ? '' : ' LIMIT ' . $limit);
-======= end
 		$stm = $this->pdo->prepare($sql);
 		if (
 			$stm !== false &&
@@ -442,16 +404,10 @@ class FreshRSS_CategoryDAO extends Minz_ModelPdo
 		}
 	}
 
-<<<<<<< variant A
 	public function getDefault(): ?FreshRSS_Category {
 		$sql = <<<'SQL'
 			SELECT * FROM `_category` WHERE id=:id
 			SQL;
->>>>>>> variant B
-	public function getDefault(): ?FreshRSS_Category
-	{
-		$sql = 'SELECT * FROM `_category` WHERE id=:id';
-======= end
 		$res = $this->fetchAssoc($sql, [':id' => self::DEFAULTCATEGORYID]) ?? [];
 		/** @var list<array{name:string,id:int,kind:int,lastUpdate?:int,error?:int,attributes?:string}> $res */
 		$categories = self::daoToCategories($res);
@@ -494,34 +450,19 @@ class FreshRSS_CategoryDAO extends Minz_ModelPdo
 		return true;
 	}
 
-<<<<<<< variant A
 	public function count(): int {
 		$sql = <<<'SQL'
 			SELECT COUNT(*) AS count FROM `_category`
 			SQL;
 		return $this->fetchInt($sql) ?? -1;
->>>>>>> variant B
-	public function count(): int
-	{
-		$sql = 'SELECT COUNT(*) AS count FROM `_category`';
-		$res = $this->fetchColumn($sql, 0);
-		return isset($res[0]) ? (int) $res[0] : -1;
-======= end
 	}
 
-<<<<<<< variant A
 	public function countFeed(int $id): int {
 		$sql = <<<'SQL'
 			SELECT COUNT(*) AS count FROM `_feed` WHERE category=:id
 			SQL;
-		return $this->fetchInt($sql, [':id' => $id]) ?? -1;
->>>>>>> variant B
-	public function countFeed(int $id): int
-	{
-		$sql = 'SELECT COUNT(*) AS count FROM `_feed` WHERE category=:id';
 		$res = $this->fetchColumn($sql, 0, [':id' => $id]);
 		return isset($res[0]) ? (int) $res[0] : -1;
-======= end
 	}
 
 	public function countNotRead(int $id, int $minPriority = FreshRSS_Feed::PRIORITY_CATEGORY): int
@@ -531,14 +472,9 @@ class FreshRSS_CategoryDAO extends Minz_ModelPdo
 			INNER JOIN `_feed` f ON e.id_feed=f.id
 			WHERE f.category=:id AND e.is_read=0
 			AND f.priority>=:minPriority
-<<<<<<< variant A
 			SQL;
-		return $this->fetchInt($sql, [':id' => $id, ':minPriority' => $minPriority]) ?? -1;
->>>>>>> variant B
-		SQL;
 		$res = $this->fetchColumn($sql, 0, [':id' => $id, ':minPriority' => $minPriority]);
 		return isset($res[0]) ? (int) $res[0] : -1;
-======= end
 	}
 
 	/** @return list<string> */
