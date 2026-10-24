@@ -352,7 +352,7 @@ class FreshRSS_CategoryDAO extends Minz_ModelPdo
                 LEFT OUTER JOIN `_feed` f ON f.category=c.id
                 LEFT JOIN `_entry` e ON f.id=e.id_feed
                 GROUP BY f.id, c_id
-                ORDER BY c.name, f.name
+                ORDER BY c.name, MAX(e.date) DESC
                 SQL;
             $stm = $this->pdo->prepare($sql);
             if ($stm !== false && $stm->execute() && ($res = $stm->fetchAll(PDO::FETCH_ASSOC)) !== false) {
